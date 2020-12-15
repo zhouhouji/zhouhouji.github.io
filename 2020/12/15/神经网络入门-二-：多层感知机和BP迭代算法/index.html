@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"8.0.0-rc.5","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false};
+  </script>
+
+  <meta name="description" content="多层感知机就是含有至少一个隐藏层的由全连接层组成的神经网络，且在整个神经网络中除了输入层之外，每一层都经过激活函数进行非线性变换。多层感知机的层数和各隐藏层中隐藏单元个数都是超参数。参考下图的单隐藏层的MLP结构：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="神经网络入门(二)：多层感知机和BP迭代算法">
+<meta property="og:url" content="http://yoursite.com/2020/12/15/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%85%A5%E9%97%A8-%E4%BA%8C-%EF%BC%9A%E5%A4%9A%E5%B1%82%E6%84%9F%E7%9F%A5%E6%9C%BA%E5%92%8CBP%E8%BF%AD%E4%BB%A3%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="Adam&#39;s NoteBook">
+<meta property="og:description" content="多层感知机就是含有至少一个隐藏层的由全连接层组成的神经网络，且在整个神经网络中除了输入层之外，每一层都经过激活函数进行非线性变换。多层感知机的层数和各隐藏层中隐藏单元个数都是超参数。参考下图的单隐藏层的MLP结构：">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-12-15T04:30:17.000Z">
+<meta property="article:modified_time" content="2020-12-15T05:07:48.184Z">
+<meta property="article:author" content="Adam">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="机器学习">
+<meta property="article:tag" content="人工智能">
+<meta property="article:tag" content="多层感知机">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://yoursite.com/2020/12/15/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%85%A5%E9%97%A8-%E4%BA%8C-%EF%BC%9A%E5%A4%9A%E5%B1%82%E6%84%9F%E7%9F%A5%E6%9C%BA%E5%92%8CBP%E8%BF%AD%E4%BB%A3%E7%AE%97%E6%B3%95/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>神经网络入门(二)：多层感知机和BP迭代算法 | Adam's NoteBook</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Adam's NoteBook</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E5%B1%82%E6%84%9F%E7%9F%A5%E6%9C%BA%EF%BC%88multi-layer-perception-MLP-%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">多层感知机（multi layer perception, MLP ）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E5%93%8D%E4%BC%A0%E6%92%AD%E7%AE%97%E6%B3%95%EF%BC%88Back-propagation%EF%BC%89"><span class="nav-number">2.</span> <span class="nav-text">反响传播算法（Back propagation）</span></a></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Adam</p>
+  <div class="site-description" itemprop="description">Simple and Fearless</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zhouhouji" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zhouhouji" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div id="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/15/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%85%A5%E9%97%A8-%E4%BA%8C-%EF%BC%9A%E5%A4%9A%E5%B1%82%E6%84%9F%E7%9F%A5%E6%9C%BA%E5%92%8CBP%E8%BF%AD%E4%BB%A3%E7%AE%97%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Adam">
+      <meta itemprop="description" content="Simple and Fearless">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Adam's NoteBook">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          神经网络入门(二)：多层感知机和BP迭代算法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-12-15 12:30:17 / 修改时间：13:07:48" itemprop="dateCreated datePublished" datetime="2020-12-15T12:30:17+08:00">2020-12-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+            </span>
+
+          
+            <div class="post-description">多层感知机就是含有至少一个隐藏层的由全连接层组成的神经网络，且在整个神经网络中除了输入层之外，每一层都经过激活函数进行非线性变换。多层感知机的层数和各隐藏层中隐藏单元个数都是超参数。参考下图的单隐藏层的MLP结构：</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p><a target="_blank" rel="noopener" href="https://blog.csdn.net/msssssss/article/details/104418555">前一篇文章</a>中我们提到单层感知机网络被局限在解决传统的是非问题，当面对异或这类问题时则显得无能为力，为了解决这一问题，人们通过增加网络层数来提升神经网络解决问题的能力。这就是我们今天要讲到的多层感知机以及用来在多层感知机中用来实现权重迭代的方法—BP（Back propagation）迭代方法。实际上两者混在一起也就是我们常说的BP神经网络。</p>
+<h3 id="多层感知机（multi-layer-perception-MLP-）"><a href="#多层感知机（multi-layer-perception-MLP-）" class="headerlink" title="多层感知机（multi layer perception, MLP ）"></a>多层感知机（multi layer perception, MLP ）</h3><p>多层感知机就是含有至少一个隐藏层的由全连接层组成的神经网络，且在整个神经网络中除了输入层之外，每一层都经过激活函数进行非线性变换。多层感知机的层数和各隐藏层中隐藏单元个数都是超参数。参考下图的单隐藏层的MLP结构：</p>
+<center>
+<img src = "https://img-blog.csdnimg.cn/20200315125451591.png" width="45%" height="45%" >
+</img>
+</center>
+
+<h3 id="反响传播算法（Back-propagation）"><a href="#反响传播算法（Back-propagation）" class="headerlink" title="反响传播算法（Back propagation）"></a>反响传播算法（Back propagation）</h3><p>反响传播算法的基本思想是，利用一次前向过程计算得到的误差，反向传播到每一层的权重上，并实现权重的逐步更新，通过足够多的更新步骤后得到一个较优权重使最终得到的误差能够满足运算标准。<br>一种最常用的误差反向传递方法是梯度下降法：即通过计算后一层到前一层的运算梯度，使得权重的变化量正比于该梯度的值，以此得到每一层权重的误差。其比例系数就是常说的学习率。</p>
+<p>BP 神经网络的相关推导网络上已经有很多，例如<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_39521554/article/details/80007223">戳这</a>，可以详细的了解其推导过程。</p>
+<p>下面附上用BP网络实现手写数字识别的代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#三层神经网络，含有一个隐藏层</span></span><br><span class="line"><span class="comment">#结果大约在84%左右</span></span><br><span class="line"><span class="keyword">import</span> math</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#读入数据</span></span><br><span class="line"></span><br><span class="line">dataset = pd.read_csv(<span class="string">&#x27;train_data.csv&#x27;</span>,header=<span class="literal">None</span>)</span><br><span class="line"><span class="comment">#数据归一化</span></span><br><span class="line">dataset /=<span class="number">256.0</span></span><br><span class="line">dataset = dataset.values</span><br><span class="line"><span class="comment">#print (type(dataset))</span></span><br><span class="line">dataset_label=pd.read_csv(<span class="string">&#x27;train_data_labels.csv&#x27;</span>,header=<span class="literal">None</span>)</span><br><span class="line">dataset_label = dataset_label.values</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#神经网络配置</span></span><br><span class="line">dataset_num = len(dataset)</span><br><span class="line">input_num =dataset.shape[<span class="number">1</span>]       <span class="comment">#确定输入节点数</span></span><br><span class="line">out_num = <span class="number">10</span></span><br><span class="line">hid_num = <span class="number">12</span>     <span class="comment">#隐藏层节点数</span></span><br><span class="line"><span class="comment">#初始化输入权重矩阵</span></span><br><span class="line">w12 = <span class="number">0.2</span>*np.random.random((input_num,hid_num)) - <span class="number">0.1</span></span><br><span class="line"><span class="comment"># 初始化隐层权矩阵</span></span><br><span class="line">w23 = <span class="number">0.2</span>*np.random.random((hid_num, out_num))- <span class="number">0.1</span> </span><br><span class="line">print(w12.shape)</span><br><span class="line">hid_offset = np.zeros(hid_num)      <span class="comment"># 隐层偏置向量</span></span><br><span class="line">out_offset = np.zeros(out_num)      <span class="comment"># 输出层偏置向量</span></span><br><span class="line">input_learnrate = <span class="number">0.15</span>              <span class="comment"># 输入层权值学习率</span></span><br><span class="line">hid_learnrate = <span class="number">0.15</span>                <span class="comment"># 隐层学权值习率</span></span><br><span class="line">err_th = <span class="number">0.01</span>                       <span class="comment"># 学习误差门限</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#print(dataset.loc[1:2].shape)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#定义激活函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_act</span>(<span class="params">x</span>):</span></span><br><span class="line">    act_vec = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> x:</span><br><span class="line">        act_vec.append(<span class="number">1</span>/(<span class="number">1</span>+math.exp(-i)))</span><br><span class="line">    act_vec = np.array(act_vec)</span><br><span class="line">    <span class="keyword">return</span> act_vec</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_err</span>(<span class="params">e</span>):</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0.5</span>*np.dot(e,e)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 训练——可使用err_th与get_err() 配合，提前结束训练过程</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> count <span class="keyword">in</span> range (<span class="number">0</span>,dataset_num):</span><br><span class="line">    t_label =  np.zeros(out_num)</span><br><span class="line">    t_label[dataset_label[count]] = <span class="number">1</span></span><br><span class="line">    <span class="comment">#前向过程</span></span><br><span class="line">    hid_value = np.dot(dataset[count],w12)</span><br><span class="line">    hid_act = get_act(hid_value)</span><br><span class="line">    out_value = np.dot(hid_act,w23)</span><br><span class="line">    out_act = get_act(out_value)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#反向过程</span></span><br><span class="line">    </span><br><span class="line">    e = t_label - out_act</span><br><span class="line">    out_delta = e*out_act*(<span class="number">1</span>-out_act)</span><br><span class="line">    hid_delta = hid_act * (<span class="number">1</span>-hid_act)*np.dot(w23,out_delta)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,out_num):</span><br><span class="line">        <span class="comment">#更新隐藏层到输出层权向量</span></span><br><span class="line">        w23[:,i] += hid_learnrate * out_delta[i] * hid_act</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range (<span class="number">0</span>,hid_num):</span><br><span class="line">        <span class="comment">#更新输入层到隐藏层权重</span></span><br><span class="line">        w12[:,i] += input_learnrate * hid_delta[i] * dataset[count]</span><br><span class="line"></span><br><span class="line">    out_offset += hid_learnrate * out_delta</span><br><span class="line">    hid_offset += input_learnrate * hid_delta</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#测试</span></span><br><span class="line">test_data = pd.read_csv(<span class="string">&#x27;test_data.csv&#x27;</span>,header=<span class="literal">None</span>)</span><br><span class="line">test_data /=<span class="number">256.0</span></span><br><span class="line">test_data = test_data.values</span><br><span class="line"></span><br><span class="line">test_label = pd.read_csv(<span class="string">&#x27;test_data_label.csv&#x27;</span>,header=<span class="literal">None</span>)</span><br><span class="line">test_label =test_label.values</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">right = np.zeros(<span class="number">10</span>)</span><br><span class="line">numbers = np.zeros(<span class="number">10</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 统计测试数据中各个数字的数目</span></span><br><span class="line">print(test_label.shape)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> test_label:</span><br><span class="line">    numbers[i] += <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> count <span class="keyword">in</span> range(len(test_data)):</span><br><span class="line">    hid_value = np.dot(test_data[count],w12) + hid_offset</span><br><span class="line">    hid_act = get_act(hid_value)</span><br><span class="line">    out_value = np.dot(hid_act,w23) + out_offset</span><br><span class="line">    out_act = get_act(out_value)</span><br><span class="line">    <span class="keyword">if</span> np.argmax(out_act) == test_label[count]:</span><br><span class="line">        right[test_label[count]] += <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> (right)</span><br><span class="line"><span class="keyword">print</span> (numbers)</span><br><span class="line">result = right/numbers</span><br><span class="line">sum = right.sum()</span><br><span class="line"><span class="keyword">print</span> (result)</span><br><span class="line"><span class="keyword">print</span> (sum/len(test_data))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>本文代码和数据可以在我的<a target="_blank" rel="noopener" href="https://github.com/zhouhouji/CSDN_Codes/tree/master/BPNN">github主页</a>上找到。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+              <a href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" rel="tag"># 人工智能</a>
+              <a href="/tags/%E5%A4%9A%E5%B1%82%E6%84%9F%E7%9F%A5%E6%9C%BA/" rel="tag"># 多层感知机</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/12/15/Ubuntu%E7%B3%BB%E7%BB%9F%E5%87%BA%E7%8E%B0-dev-adb-clean-file-block-%E9%94%99%E8%AF%AF%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/" rel="prev" title="Ubuntu系统出现/dev/adb*  clean file, *** block.错误的解决办法">
+                  <i class="fa fa-chevron-left"></i> Ubuntu系统出现/dev/adb*  clean file, *** block.错误的解决办法
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Adam</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+      
+
+
+
+
+
+
+
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.0/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      const script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

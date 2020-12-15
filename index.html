@@ -89,7 +89,11 @@
   </style>
 </noscript>
 
-</head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
 
 <body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
   <div class="headband"></div>
@@ -191,14 +195,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">日志</span>
         </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -238,7 +248,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/24/testblog/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/15/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%85%A5%E9%97%A8-%E4%BA%8C-%EF%BC%9A%E5%A4%9A%E5%B1%82%E6%84%9F%E7%9F%A5%E6%9C%BA%E5%92%8CBP%E8%BF%AD%E4%BB%A3%E7%AE%97%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -255,7 +265,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/11/24/testblog/" class="post-title-link" itemprop="url">testblog</a>
+            <a href="/2020/12/15/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%85%A5%E9%97%A8-%E4%BA%8C-%EF%BC%9A%E5%A4%9A%E5%B1%82%E6%84%9F%E7%9F%A5%E6%9C%BA%E5%92%8CBP%E8%BF%AD%E4%BB%A3%E7%AE%97%E6%B3%95/" class="post-title-link" itemprop="url">神经网络入门(二)：多层感知机和BP迭代算法</a>
         </h2>
 
         <div class="post-meta">
@@ -264,16 +274,19 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-11-24 20:12:47" itemprop="dateCreated datePublished" datetime="2020-11-24T20:12:47+08:00">2020-11-24</time>
+              <time title="创建时间：2020-12-15 12:30:17 / 修改时间：13:07:48" itemprop="dateCreated datePublished" datetime="2020-12-15T12:30:17+08:00">2020-12-15</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-11-25 13:06:21" itemprop="dateModified" datetime="2020-11-25T13:06:21+08:00">2020-11-25</time>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
               </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+            </span>
 
           
 
@@ -284,7 +297,243 @@
     
     
     <div class="post-body" itemprop="articleBody">
+          <p>多层感知机就是含有至少一个隐藏层的由全连接层组成的神经网络，且在整个神经网络中除了输入层之外，每一层都经过激活函数进行非线性变换。多层感知机的层数和各隐藏层中隐藏单元个数都是超参数。参考下图的单隐藏层的MLP结构：</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/12/15/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%85%A5%E9%97%A8-%E4%BA%8C-%EF%BC%9A%E5%A4%9A%E5%B1%82%E6%84%9F%E7%9F%A5%E6%9C%BA%E5%92%8CBP%E8%BF%AD%E4%BB%A3%E7%AE%97%E6%B3%95/">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/15/Ubuntu%E7%B3%BB%E7%BB%9F%E5%87%BA%E7%8E%B0-dev-adb-clean-file-block-%E9%94%99%E8%AF%AF%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Adam">
+      <meta itemprop="description" content="Simple and Fearless">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Adam's NoteBook">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
           
+            <a href="/2020/12/15/Ubuntu%E7%B3%BB%E7%BB%9F%E5%87%BA%E7%8E%B0-dev-adb-clean-file-block-%E9%94%99%E8%AF%AF%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/" class="post-title-link" itemprop="url">Ubuntu系统出现/dev/adb*  clean file, *** block.错误的解决办法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-12-15 12:27:12 / 修改时间：13:06:29" itemprop="dateCreated datePublished" datetime="2020-12-15T12:27:12+08:00">2020-12-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/bug/" itemprop="url" rel="index"><span itemprop="name">bug</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Ubuntu系统出现/dev/adb*  clean file, *** block.错误的解决办法</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/12/15/Ubuntu%E7%B3%BB%E7%BB%9F%E5%87%BA%E7%8E%B0-dev-adb-clean-file-block-%E9%94%99%E8%AF%AF%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/15/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95-%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Adam">
+      <meta itemprop="description" content="Simple and Fearless">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Adam's NoteBook">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/12/15/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95-%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/" class="post-title-link" itemprop="url">机器学习基础算法---线性回归</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-12-15 12:24:47 / 修改时间：13:04:17" itemprop="dateCreated datePublished" datetime="2020-12-15T12:24:47+08:00">2020-12-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>线性回归的实质是通过一个线性函数能够较好的描述所给的数据特征。例如，下图所给的数据，通过房子的大小来预测房子的销售均价。根据现实生活中的经验，房子越大，那么每平米的房子价格会更贵一点，但是两者又不是一个纯粹的线性关系，不能用具体的函数描述。那么如果我现在手上有一个某大小的房子，我该怎么设置他的定价最合适呢？</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/12/15/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95-%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/15/Python-%E4%B8%8B%E8%BD%BDBing%E9%A6%96%E9%A1%B5%E9%AB%98%E6%B8%85%E5%9B%BE%E7%89%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Adam">
+      <meta itemprop="description" content="Simple and Fearless">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Adam's NoteBook">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/12/15/Python-%E4%B8%8B%E8%BD%BDBing%E9%A6%96%E9%A1%B5%E9%AB%98%E6%B8%85%E5%9B%BE%E7%89%87/" class="post-title-link" itemprop="url">Python 下载Bing首页高清图片</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-12-15 12:17:51 / 修改时间：13:09:30" itemprop="dateCreated datePublished" datetime="2020-12-15T12:17:51+08:00">2020-12-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>Bing上有很多精美的图片，可以利用python将这些图片抓取下来作为电脑的壁纸。本文利用python实现了对必应首页上的图片抓取。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/12/15/Python-%E4%B8%8B%E8%BD%BDBing%E9%A6%96%E9%A1%B5%E9%AB%98%E6%B8%85%E5%9B%BE%E7%89%87/">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -453,6 +702,59 @@
 
 
   
+
+  
+      <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      const script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
 
   
 

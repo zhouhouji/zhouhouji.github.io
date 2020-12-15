@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"8.0.0-rc.5","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false};
+  </script>
+
+  <meta name="description" content="线性回归的实质是通过一个线性函数能够较好的描述所给的数据特征。例如，下图所给的数据，通过房子的大小来预测房子的销售均价。根据现实生活中的经验，房子越大，那么每平米的房子价格会更贵一点，但是两者又不是一个纯粹的线性关系，不能用具体的函数描述。那么如果我现在手上有一个某大小的房子，我该怎么设置他的定价最合适呢？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习基础算法---线性回归">
+<meta property="og:url" content="http://yoursite.com/2020/12/15/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95-%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/index.html">
+<meta property="og:site_name" content="Adam&#39;s NoteBook">
+<meta property="og:description" content="线性回归的实质是通过一个线性函数能够较好的描述所给的数据特征。例如，下图所给的数据，通过房子的大小来预测房子的销售均价。根据现实生活中的经验，房子越大，那么每平米的房子价格会更贵一点，但是两者又不是一个纯粹的线性关系，不能用具体的函数描述。那么如果我现在手上有一个某大小的房子，我该怎么设置他的定价最合适呢？">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-12-15T04:24:47.000Z">
+<meta property="article:modified_time" content="2020-12-15T05:04:17.623Z">
+<meta property="article:author" content="Adam">
+<meta property="article:tag" content="机器学习">
+<meta property="article:tag" content="线性回归">
+<meta property="article:tag" content="人工智能">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://yoursite.com/2020/12/15/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95-%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>机器学习基础算法---线性回归 | Adam's NoteBook</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Adam's NoteBook</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">线性回归描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E6%97%B6%E4%BD%BF%E7%94%A8%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">何时使用线性回归？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">基本数学模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">3.1.</span> <span class="nav-text">损失函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98"><span class="nav-number">3.2.</span> <span class="nav-text">最小二乘</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E6%9C%AC%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.</span> <span class="nav-text">机器学习基本模型</span></a></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Adam</p>
+  <div class="site-description" itemprop="description">Simple and Fearless</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zhouhouji" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zhouhouji" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div id="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/15/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E7%AE%97%E6%B3%95-%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Adam">
+      <meta itemprop="description" content="Simple and Fearless">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Adam's NoteBook">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          机器学习基础算法---线性回归
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-12-15 12:24:47 / 修改时间：13:04:17" itemprop="dateCreated datePublished" datetime="2020-12-15T12:24:47+08:00">2020-12-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a>
+                </span>
+            </span>
+
+          
+            <div class="post-description">线性回归的实质是通过一个线性函数能够较好的描述所给的数据特征。例如，下图所给的数据，通过房子的大小来预测房子的销售均价。根据现实生活中的经验，房子越大，那么每平米的房子价格会更贵一点，但是两者又不是一个纯粹的线性关系，不能用具体的函数描述。那么如果我现在手上有一个某大小的房子，我该怎么设置他的定价最合适呢？</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="线性回归描述"><a href="#线性回归描述" class="headerlink" title="线性回归描述"></a>线性回归描述</h2><p>线性回归的实质是通过一个线性函数能够较好的描述所给的数据特征。例如，下图所给的数据，通过房子的大小来预测房子的销售均价。根据现实生活中的经验，房子越大，那么每平米的房子价格会更贵一点，但是两者又不是一个纯粹的线性关系，不能用具体的函数描述。那么如果我现在手上有一个某大小的房子，我该怎么设置他的定价最合适呢？</p>
+<center>
+<img 
+src ='https://img-my.csdn.net/uploads/201209/06/1346901927_1435.png'>
+</img>
+</center>
+
+<p>我们可以通过线性回归的方式，来寻找一个较优的函数来描述这种现有的数据，虽然不是精确地，但是是我在现有知识下已经达到的较好甚至最好方法了，也是可以的。</p>
+<p>线性回归，从名字上来看，包含两个方面的内容，一是线性，表示的是模拟的特征描述函数是线性的，这包含一元线性的和多元线性的；另一方面是回归，表征的是数据特征，是在线性函数周围波动的。</p>
+<h2 id="何时使用线性回归？"><a href="#何时使用线性回归？" class="headerlink" title="何时使用线性回归？"></a>何时使用线性回归？</h2><p>一般来说，线性回归是一个基本的数学方法，首先我们要考虑我们现有的数据特征是否符合现象回归的方法，做常用的办法是使用散点图的办法看一下数据的分布是否是线性得分布在坐标平面上。</p>
+<center>
+<img src=
+'https://img-my.csdn.net/uploads/201209/06/1346901929_3717.png'>
+</img>
+</center>
+其次是可以计算自变量和因变量之间的皮尔逊系数，看一下两者的相关性强弱，如果相关性强的话是可以考虑用线性回归的
+最后就是多次尝试，做拟合的过程是一个尝试的过程，谁也不知道那个函数形式是最好的形式，因此需要进行多次尝试找到最适合的描述方法，而这其中，线性回归方法是首当其冲的
+
+
+<h2 id="基本数学模型"><a href="#基本数学模型" class="headerlink" title="基本数学模型"></a>基本数学模型</h2><p>一元线性回归实质上是描述的一个自变量和一个因变量之间的关系，考虑一元函数常数项的话可以假设数据具有如下的函数类型：<br>$$h_θ (x)=θ_0+θ_1 x$$<br>我们常称$x$为feature，$h(x)$为hypothesis。可以想象，该函数是二维平面中的线</p>
+<p>而类似的多元线性回归只是在自变量数量上有所不同。因此可以得到类似的假设形式：<br>$$h_θ (X_i )=θ_0+θ_1 x_1+θ_2 x_2+⋯+θ_i x_i+⋯$$<br>在应用过程中只用找到对应的参数θ_i即可。文章讨论一元数据与多元数据是没有太大影响的，考虑到模型的普遍性，本文主要对多元回归进行介绍。</p>
+<p>设已知数据集，$X={X_1,X_2,…,X_n }^T$,对于每个$X_i$又包含m个维度的数据，即$X_i={x_{i1},x_{i2},…,x_{im}}$，对应的结果数据集为$Y={y_1,y_2,…,y_n }^T$.</p>
+<h3 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h3><p>那么我们可以通过已知的Y有监督的去寻找一系列最符合要求的$θ_i$。<br>首先定义我们需要的损失函数，即怎样才能算是“最符合”要求。通常情况下我们会定义预测输出与实际输出的平方误差最小为我们的目标函数，我们称此时的参数为最符合我们要求的,</p>
+<p>$$ J(θ)=\sum_{i=1}^n(h_θ (X_i )-y_i )^2 =(X_θ-Y) \tag{1} $$<br>参数优化的目标就是让上式尽可能的小，最好能有最小值（尽管在最小值是也不一定是最优的参数组合，但是已经是一个比较好的参数组合了）。</p>
+<h3 id="最小二乘"><a href="#最小二乘" class="headerlink" title="最小二乘"></a>最小二乘</h3><p>传统的计算方法是通过最小二乘的方法得到得到损失函数的最小值,通过梯度下降法对参数求导数：<br>$$\frac{∂J(θ)}{∂θ}=2X^T (Xθ-Y)$$<br>然后利用导数等于零，求的最小值：<br>$$X^T Xθ=X^T Y⇒θ=(X^T X)^(-1) X^T Y$$<br>通过公式直接计算即可。<br>该方法主要存在以下几个特点：</p>
+<ul>
+<li>矩阵的逆可能不存在     </li>
+<li>该过程实际上是一个解线性方程组的过程，     </li>
+<li>计算量比较大</li>
+</ul>
+<h2 id="机器学习基本模型"><a href="#机器学习基本模型" class="headerlink" title="机器学习基本模型"></a>机器学习基本模型</h2><p>既然作为一个基本的机器学习的算法，那么该算法也可以通过机器学习的模式进行考量。机器学习的最基础模型是一个简单的<a target="_blank" rel="noopener" href="https://blog.csdn.net/msssssss/article/details/104418555">感知机模型</a>，感知机模型的本质实际上是一个线性函数拟合器，我们把输入向量定义为$X_i$的m个维度数据，输出向量定义为$y_i$,那么线性回归就可以归结为一个包含偏置的（m+1）输入，单输出的感知机模型。针对于目标函数，可以通过随机梯度函数的方式进行优化，对式（1）进行展开，即可按照以下模式进行优化：</p>
+<center>
+<img src =  ' https://img-my.csdn.net/uploads/201209/06/1346902563_5470.png'>
+</img>
+</center>
+
+<p><a target="_blank" rel="noopener" href="https://zhouhouji.github.io/">个人主页</a></p>
+<p>参考文章：</p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/45023349">https://zhuanlan.zhihu.com/p/45023349</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/xbinworld/article/details/43919445">https://blog.csdn.net/xbinworld/article/details/43919445</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiazdong/article/details/7950084">https://blog.csdn.net/xiazdong/article/details/7950084</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/pinard/p/5976811.html">https://www.cnblogs.com/pinard/p/5976811.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+              <a href="/tags/%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92/" rel="tag"># 线性回归</a>
+              <a href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" rel="tag"># 人工智能</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/12/15/Python-%E4%B8%8B%E8%BD%BDBing%E9%A6%96%E9%A1%B5%E9%AB%98%E6%B8%85%E5%9B%BE%E7%89%87/" rel="prev" title="Python 下载Bing首页高清图片">
+                  <i class="fa fa-chevron-left"></i> Python 下载Bing首页高清图片
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/12/15/Ubuntu%E7%B3%BB%E7%BB%9F%E5%87%BA%E7%8E%B0-dev-adb-clean-file-block-%E9%94%99%E8%AF%AF%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/" rel="next" title="Ubuntu系统出现/dev/adb*  clean file, *** block.错误的解决办法">
+                  Ubuntu系统出现/dev/adb*  clean file, *** block.错误的解决办法 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Adam</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+      
+
+
+
+
+
+
+
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.0/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      const script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
